@@ -35,6 +35,7 @@ app.use('/api/uploads', uploadsRouter);
 app.use('/api/coupons', couponsRouter);
 app.use('/api/auth', authRouter);
 
+
 app.get('/api/admin/summary', authMiddleware, adminOnly, async (req, res) => {
   const totalProducts = await Product.countDocuments();
   const totalCategories = await Category.countDocuments();
@@ -44,14 +45,6 @@ app.get('/api/admin/summary', authMiddleware, adminOnly, async (req, res) => {
     $or: [ { expiresAt: null }, { expiresAt: { $gt: new Date() } } ]
   });
   const lowStock = await Product.find({ 'inventory.stock': { $lte: 5 } }).limit(10);
-
-  console.log('Admin summary counts:', { 
-    totalProducts, 
-    totalCategories, 
-    totalCoupons, 
-    totalActiveCoupons, 
-    lowStockCount: lowStock.length 
-  });
 
   res.json({ 
     totalProducts, 
@@ -113,6 +106,7 @@ app.post('/api/public/coupons/validate', async (req, res) => {
   });
 });
 
+
 const PORT = process.env.PORT || 4000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ecommerce';
 
@@ -121,11 +115,11 @@ mongoose
   .then(() => {
     console.log('MongoDB connected');
 
-    app.use(express.static(path.join(__dirname, "client/dist")));
+    app.use(express.static(path.join(__dirname, "../client/dist")));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client/dist/index.html"));
-});
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+    });
 
     app.listen(PORT, () => console.log('Server started on port', PORT));
   })
